@@ -17,6 +17,7 @@ function App() {
   });
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalEditIsOpen, setModalEditIsOpen] = useState(false);
 
   const handleChange = e => {
     const {name, value} = e.target;
@@ -44,9 +45,37 @@ function App() {
     .catch(error => console.log(error))
   }
 
+  const putStudent = async () => {
+    
+    console.log('PUT Student', student)
+
+    await axios.put(baseURL + '/'+ student.id, student)
+    .then(response => {
+      var newData = response.data;
+      data.map(stud => {
+        if(student.id === stud.id) {
+          stud.name = newData.name;
+          stud.email = newData.email;
+          stud.age = newData.age;
+        }
+      });
+      setData(data);
+      openCloseEditModal();
+    })
+  }
+
   const openCloseModal = () => {
     setModalIsOpen(!modalIsOpen);
   }
+
+  const openCloseEditModal = () => {
+    setModalEditIsOpen(!modalEditIsOpen);
+  }
+
+  const selectStudent = (student, option) => {
+    setStudent(student);
+    (option === 'edit') ? openCloseEditModal() : alert('Excluir');
+  };
 
   useEffect(() => { 
     getStudents();
@@ -78,8 +107,8 @@ function App() {
             <td>{student.email}</td>
             <td>{student.age}</td>
             <td>
-              <button className='btn btn-primary'>Editar</button> {"  "}
-              <button className='btn btn-danger'>Excluir</button> {"  "}
+              <button className='btn btn-primary' onClick={ () => selectStudent(student, "edit") }>Editar</button> {"  "}
+              <button className='btn btn-danger' onClick={ () => selectStudent(student, "delete") }>Excluir</button> {"  "}
             </td>
           </tr>
          ))}
@@ -107,6 +136,34 @@ function App() {
         <ModalFooter>
           <button className='btn btn-primary' onClick={ () => postStudents() }>Incluir</button>{"    "}
           <button className='btn btn-danger' onClick={ () => openCloseModal() }>Cancelar</button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal isOpen={modalEditIsOpen}>
+        <ModalHeader>Editar Aluno</ModalHeader>
+        <ModalBody>
+          <div className='form-group'>
+            <label>ID: </label>
+            <br />
+            <input type="text" readOnly className='form-control' value={student && student.id}/>
+            <br />
+            <label>Nome: </label>
+            <br />
+            <input type="text" className='form-control' name="name" value={student && student.name} onChange={handleChange}/>
+            <br />
+            <label>E-mail: </label>
+            <br />
+            <input type="text" className='form-control' name="email" value={student && student.email} onChange={handleChange}/>
+            <br />
+            <label>Idade</label>
+            <br />
+            <input type="text" className='form-control' name="age" value={student && student.age} onChange={handleChange}/>
+            <br />
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <button className='btn btn-primary' onClick={ () => putStudent() }>Salvar</button>{"    "}
+          <button className='btn btn-danger' onClick={ () => openCloseEditModal() }>Cancelar</button>
         </ModalFooter>
       </Modal>
     </div>

@@ -33,7 +33,18 @@ function App() {
     .catch(error => console.log(error))
   }
 
-  const openModal = () => {
+  const postStudents = async () => {
+    delete student.id;
+    student.age = parseInt(student.age);
+    await axios.post(baseURL, student)
+    .then(response => { 
+      setData(data.concat(response.data));
+      openCloseModal();
+    })
+    .catch(error => console.log(error))
+  }
+
+  const openCloseModal = () => {
     setModalIsOpen(!modalIsOpen);
   }
 
@@ -47,7 +58,7 @@ function App() {
       <h3>Cadastro de Alunos</h3>
       <header>
         <NotebookPen size={90}/>
-        <button className='btn btn-success'>Incluir Novo Aluno</button>
+        <button className='btn btn-success' onClick={ () => openCloseModal() }>Incluir Novo Aluno</button>
       </header>
       <table className='table table-bordered'>
         <thead>
@@ -94,8 +105,8 @@ function App() {
           </div>
         </ModalBody>
         <ModalFooter>
-          <button className='btn btn-primary'>Incluir</button>{"    "}
-          <button className='btn btn-danger'>Cancelar</button>
+          <button className='btn btn-primary' onClick={ () => postStudents() }>Incluir</button>{"    "}
+          <button className='btn btn-danger' onClick={ () => openCloseModal() }>Cancelar</button>
         </ModalFooter>
       </Modal>
     </div>

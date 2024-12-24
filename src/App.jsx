@@ -18,6 +18,8 @@ function App() {
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalEditIsOpen, setModalEditIsOpen] = useState(false);
+  const [modalDeleteIsOpen, setModalDeleteIsOpen] = useState(false);
+  const [updateData, setUpdateData] = useState(true);
 
   const handleChange = e => {
     const {name, value} = e.target;
@@ -40,15 +42,13 @@ function App() {
     await axios.post(baseURL, student)
     .then(response => { 
       setData(data.concat(response.data));
+      setUpdateData(true);
       openCloseModal();
     })
     .catch(error => console.log(error))
   }
 
   const putStudent = async () => {
-    
-    console.log('PUT Student', student)
-
     await axios.put(baseURL + '/'+ student.id, student)
     .then(response => {
       var newData = response.data;
@@ -60,7 +60,18 @@ function App() {
         }
       });
       setData(data);
+      setUpdateData(true);
       openCloseEditModal();
+    })
+  }
+
+  const deleteStudent = async () => {
+    await axios.delete(baseURL + '/'+ student.id, student)
+    .then(() => {
+       var newData = data.filter(stud => student.id !== stud.id);
+      setData(newData);
+      setUpdateData(true);
+      openCloseDeleteModal();
     })
   }
 
@@ -72,21 +83,28 @@ function App() {
     setModalEditIsOpen(!modalEditIsOpen);
   }
 
+  const openCloseDeleteModal = () => {
+    setModalDeleteIsOpen(!modalDeleteIsOpen);
+  }
+
   const selectStudent = (student, option) => {
     setStudent(student);
-    (option === 'edit') ? openCloseEditModal() : alert('Excluir');
+    (option === 'edit') ? openCloseEditModal() : openCloseDeleteModal();
   };
 
   useEffect(() => { 
-    getStudents();
-  });
+    if(updateData) {
+      getStudents();
+      setUpdateData(false);
+    }
+  },[updateData]);
 
   return (
     <div className='App'>
       <br/>
       <h3>Cadastro de Alunos</h3>
       <header>
-        <NotebookPen size={90}/>
+        <NotebookPen size={48}/>{ "      "}
         <button className='btn btn-success' onClick={ () => openCloseModal() }>Incluir Novo Aluno</button>
       </header>
       <table className='table table-bordered'>
@@ -164,6 +182,17 @@ function App() {
         <ModalFooter>
           <button className='btn btn-primary' onClick={ () => putStudent() }>Salvar</button>{"    "}
           <button className='btn btn-danger' onClick={ () => openCloseEditModal() }>Cancelar</button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal isOpen={modalDeleteIsOpen}>
+        <ModalHeader>Excluir Aluno</ModalHeader>
+        <ModalBody>
+          Confirma a exclusão deste(a) aluno(a): {student && student.name} ?
+        </ModalBody>
+        <ModalFooter>
+          <button className='btn btn-danger' onClick={ () => deleteStudent() }>Sim</button>{"    "}
+          <button className='btn btn-secundary' onClick={ () => openCloseDeleteModal() }>Não</button>
         </ModalFooter>
       </Modal>
     </div>

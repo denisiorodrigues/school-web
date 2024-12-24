@@ -9,11 +9,32 @@ function App() {
   const baseURL = 'http://localhost:5259/api/student'
 
   const [data, setData] = useState([])
+  const [student, setStudent] = useState({
+    id: '',
+    name: '',
+    email: '',
+    age: ''
+  });
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const handleChange = e => {
+    const {name, value} = e.target;
+    setStudent({
+      ...student,
+      [name]: value
+    });
+    console.log(student);
+  }
 
   const getStudents = async () => {
     await axios.get(baseURL)
     .then(response => setData(response.data))
     .catch(error => console.log(error))
+  }
+
+  const openModal = () => {
+    setModalIsOpen(!modalIsOpen);
   }
 
   useEffect(() => { 
@@ -53,6 +74,30 @@ function App() {
          ))}
         </tbody>
       </table>
+
+      <Modal isOpen={modalIsOpen}>
+        <ModalHeader>Incluir Alunos</ModalHeader>
+        <ModalBody>
+          <div className='form-group'>
+            <label>Nome: </label>
+            <br />
+            <input type="text" className='form-control' name="name" onChange={handleChange}/>
+            <br />
+            <label>E-mail: </label>
+            <br />
+            <input type="text" className='form-control' name="email" onChange={handleChange}/>
+            <br />
+            <label>Idade</label>
+            <br />
+            <input type="text" className='form-control' name="age" onChange={handleChange}/>
+            <br />
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <button className='btn btn-primary'>Incluir</button>{"    "}
+          <button className='btn btn-danger'>Cancelar</button>
+        </ModalFooter>
+      </Modal>
     </div>
   )
 }

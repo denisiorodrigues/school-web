@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './styles.css'
-import { BookLock, LogOut, Search, PencilRuler, User  } from 'lucide-react';
+import { BookLock, LogOut, Search, PencilRuler, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
 import api from '../../services/api';
@@ -8,6 +8,7 @@ import api from '../../services/api';
 
 export default function Students() {
     const [students, setStudents] = useState([])
+    const [filteredStudents, setFilteredStudents] = useState([])
 
     const token = localStorage.getItem('token')
     const email = localStorage.getItem('email')
@@ -24,6 +25,7 @@ export default function Students() {
         api.get('/api/Student', authorization)
         .then(response => {
             setStudents(response.data)
+            setFilteredStudents(response.data)
         }, token)
     }, [])
 
@@ -48,6 +50,29 @@ export default function Students() {
         }
     }
 
+    async function deleteStudent(id) {
+        try {
+            if(window.confirm('Deseja realmente deletar este aluno?')) {
+                await api.delete(`/api/Student/${id}`, authorization)
+                const result = students.filter(student => student.id !== id)
+                setStudents(result)
+                setFilteredStudents(result)
+            }
+        } catch (error) {
+            alert('Falha ao deletar aluno, tente novamente')
+            console.error(error)
+        }
+    } 
+
+    async function searchStudent(name) {
+        if(name.length) {
+            const filteredData = students.filter(student => student.name.includes(name))
+            setFilteredStudents(filteredData)
+        } else {
+            setFilteredStudents(students)
+        }
+    }
+
     return (
         <div className='student-container'>
             <header>
@@ -60,17 +85,17 @@ export default function Students() {
                 </button>
             </header>
             <form action="">
-                <input type="text" placeholder='Name'/>
-                <button type='button' className='button'>
+                <input type="text" placeholder='Buscar por nome' onChange={(element) => searchStudent(element.target.value)}/>
+                {/* <button type='button' className='button'>
                     <Search className='button-icon'/>
                     <span className='button-icon'>Buscar</span>
 
-                </button>
+                </button> */}
             </form>
             <h1>Relação de Alunos</h1>
 
             <ul className="">
-                {students.map((student) => (
+                {filteredStudents.map((student) => (
                 <li key={student.id}>
                     <b>Nome:</b> {student.name} <br /><br />
                     <b>E-mail:</b> {student.email} <br /><br />
@@ -81,8 +106,8 @@ export default function Students() {
                     <button type='button' onClick={() => editStudent(student.id)}>
                         <PencilRuler  size={25} color='#17202a'/>
                     </button>
-                    <button type='button'>
-                        <User  size={25} color='#17202a'/>
+                    <button type='button' onClick={() => deleteStudent(student.id)}>
+                        <Trash2 size={25} color='#17202a'/>
                     </button>
                 </li>
                 ))}

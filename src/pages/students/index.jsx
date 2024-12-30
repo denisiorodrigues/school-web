@@ -7,7 +7,6 @@ import api from '../../services/api';
 
 
 export default function Students() {
-    const [name, setName] = useState('')
     const [students, setStudents] = useState([])
 
     const token = localStorage.getItem('token')
@@ -37,6 +36,15 @@ export default function Students() {
         } catch (error) {
             alert('Falha ao sair, tente novamente')
             console.error(error)
+        }
+    }
+
+    async function editStudent(id) {
+        try {
+            navigate(`/students/edit/${id}`)
+        } catch (error) {
+            alert('Falha ao editar aluno, tente novamente')
+            console.error(error)          
         }
     }
 
@@ -70,7 +78,7 @@ export default function Students() {
                     {/* <Link to={`edit/${student.id}`}>
                         <PencilRuler  size={25} color='#17202a'/>
                     </Link> */}
-                    <button type='button'>
+                    <button type='button' onClick={() => editStudent(student.id)}>
                         <PencilRuler  size={25} color='#17202a'/>
                     </button>
                     <button type='button'>

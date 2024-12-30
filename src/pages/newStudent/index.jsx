@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './styles.css';
 import { UserPlus, Undo2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, } from 'react-router-dom';
 import { useNavigate } from "react-router";
 import api from '../../services/api';
 
@@ -21,14 +21,15 @@ export default function NewStudent() {
         }
     }
 
-    async function createStudent() {
+    async function createStudent(event) {
+        event.preventDefault();
         const data = {
             name, email, age
         }
 
         try {
             await api.post(`/api/Student/`, data, authorization)
-            navigate('/students')
+            return navigate('/students', { replace: true })
         } catch (error) {
             alert('Falha ao cadastrar aluno, tente novamente')
             console.error(error)
@@ -46,11 +47,11 @@ export default function NewStudent() {
                         Voltar
                     </Link>
                 </section>
-                <form action="">
+                <form action="" onSubmit={createStudent}>  
                     <input type="name" placeholder="Nome" onChange={e => setName(e.target.value)}/>
                     <input type="email" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
                     <input type="number" placeholder="Idade" onChange={e => setAge(e.target.value)}/>
-                    <button className='button' type="submit" onClick={createStudent}>Cadastrar</button>
+                    <button className='button' type="submit">Cadastrar</button>
                 </form>
             </div>
         </div>

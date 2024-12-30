@@ -8,10 +8,10 @@ export default function EditStudent() {
 
     const navigate = useNavigate()
 
-    const [id, setId] = useState(null)
+    const [id, setId] = useState(0)
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
-    const [age, setAge] = useState(null)
+    const [age, setAge] = useState(0)
 
     const { studentId } = useParams();
 
@@ -25,7 +25,8 @@ export default function EditStudent() {
 
     useEffect(() => {
         getStudent()
-    })
+        console.log('Use effet executado')
+    }, [studentId])
 
     async function getStudent() {
         try {
@@ -40,14 +41,15 @@ export default function EditStudent() {
         }
     }
 
-    async function updateStudent() {
+    async function updateStudent(event) {
+        event.preventDefault();
         const data = {
-            name, email, age
+            id, name, email, age
         }
 
         try {
             await api.put(`/api/Student/${id}`, data, authorization)
-            navigate('/students')
+            navigate('/students', { replace: true })
         } catch (error) {
             alert('Falha ao atualizar aluno, tente novamente')
             console.error(error)
@@ -65,11 +67,11 @@ export default function EditStudent() {
                         Voltar
                     </Link>
                 </section>
-                <form action="">
-                    <input type="name" placeholder="Nome" value={name} onChange={e => setName(e.target.value)}/>
-                    <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)}/>
+                <form action="" onSubmit={updateStudent}>
+                    <input type="text" placeholder="Nome" value={name} onChange={e => setName(e.target.value)}/>
+                    <input type="text" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)}/>
                     <input type="number" placeholder="Idade" value={age} onChange={e => setAge(e.target.value)}/>
-                    <button className='button' type="submit" onClick={updateStudent}>Atualizar</button>
+                    <button className='button' type="submit">Atualizar</button>
                 </form>
             </div>
         </div>

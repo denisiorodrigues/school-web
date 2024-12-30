@@ -25,7 +25,7 @@ export default function Students() {
         .then(response => {
             setStudents(response.data)
         }, token)
-    })
+    }, [])
 
     async function logout() {
         try {
@@ -41,7 +41,7 @@ export default function Students() {
 
     async function editStudent(id) {
         try {
-            navigate(`/students/edit/${id}`)
+            navigate(`/students/edit/${id}`, {replace: true})
         } catch (error) {
             alert('Falha ao editar aluno, tente novamente')
             console.error(error)          
